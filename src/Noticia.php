@@ -97,6 +97,8 @@ final class Noticia {
 
     public function listar():array {
         /* Se o tipo de usuário logado for admin */
+
+        // Se o erro ocorrer quando nao for admin, podemos deduzir que o erro está no ELSE;
         if( $this->usuario->getTipo() === 'admin' ){
             /* então ele poderá acessar as notícias
             de todo mundo */
@@ -104,7 +106,9 @@ final class Noticia {
         } else {
             /* Senão (ou seja, é um editor), este usuário (editor)
             poderá acessar SOMENTE suas próprias notícias */
-            $sql = "SELECT id, titulo, data, destaque FROM noticias WHERE usuario_id = usuario_id ORDER BY data DESC";
+
+            // Quando for invalid parameter number é porque o número de SQLS é diferente do numero de :PARAMETROS
+            $sql = "SELECT id, titulo, data, destaque FROM noticias WHERE usuario_id = :usuario_id ORDER BY data DESC";
         }
 
         try {
@@ -123,6 +127,108 @@ final class Noticia {
     } //final do listar
 
 
+    
+    public function listar1():array {
+        /* Se o tipo de usuário logado for admin */
+
+        // Se o erro ocorrer quando nao for admin, podemos deduzir que o erro está no ELSE;
+        if( $this->usuario->getTipo() === 'admin' ){
+
+            $sql = "SELECT titulo, texto, resumo, imagem, usuario_id, categoria_id, destaque FROM noticias WHERE id = :id";
+        } else {
+            /* Senão (ou seja, é um editor), este usuário (editor)
+            poderá acessar SOMENTE suas próprias notícias */
+
+            // Quando for invalid parameter number é porque o número de SQLS é diferente do numero de :PARAMETROS-NOMEADOS
+            $sql = "SELECT titulo, texto, resumo, imagem, usuario_id, categoria_id, destaque FROM noticias WHERE id = :id AND usuario_id = :usuario_id";
+        }
+
+        try {
+            $consulta = $this->conexao->prepare($sql);
+            
+            //Parametro id da notícia (usado para todos os usuários)
+            $consulta->bindParam(":id", $this->id,PDO::PARAM_INT);
+            /* Se NÃO FOR um usuário admin, então trate o parâmetro de usuario_id antes de executar. */
+            if ($this->usuario->getTipo() !== 'admin') {
+                
+                
+                //Parâmetro usuario_id
+                $consulta->bindValue(":usuario_id", $this->usuario->getId(),PDO::PARAM_INT);
+            } 
+            $consulta->execute();
+            $resultado = $consulta->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $erro) {
+            die("Erro: ". $erro->getMessage());
+        }
+        return $resultado;
+    } //final do listar1
+
+
+
+    public function atualizar():void {
+        /* Se o tipo de usuário logado for admin */
+
+        // Se o erro ocorrer quando nao for admin, podemos deduzir que o erro está no ELSE;
+        if( $this->usuario->getTipo() === 'admin' ){
+
+            $sql = "UPDATE noticias SET 
+                    titulo = :titulo,
+                    texto = :texto, 
+                    resumo = :resumo, 
+                    imagem = :imagem, 
+                    categoria_id = :categoria_id,
+                    destaque = :destaque WHERE id = :id";
+        } else {
+            /* Senão (ou seja, é um editor), este usuário (editor)
+            poderá acessar SOMENTE suas próprias notícias */
+
+            // Quando for invalid parameter number é porque o número de SQLS é diferente do numero de :PARAMETROS-NOMEADOS
+            $sql = "UPDATE noticias SET 
+                    titulo = :titulo,
+                    texto = :texto, 
+                    resumo = :resumo, 
+                    imagem = :imagem, 
+                    categoria_id = :categoria_id,
+                    destaque = :destaque WHERE id = :usuario_id";
+        }
+
+        try {
+            $consulta = $this->conexao->prepare($sql);
+            $consulta->bindParam(":id", $this->id, PDO::PARAM_INT);
+            $consulta->bindParam(":titulo", $this->titulo, PDO::PARAM_STR);
+            $consulta->bindParam(":texto", $this->texto, PDO::PARAM_STR);
+            $consulta->bindParam(":resumo", $this->resumo, PDO::PARAM_STR);
+            $consulta->bindParam(":imagem", $this->imagem, PDO::PARAM_STR);
+            $consulta->bindParam(":categoria_id", $this->categoriaId, PDO::PARAM_INT);
+            $consulta->bindParam(":destaque", $this->destaque, PDO::PARAM_STR);
+            
+            //Parametro id da notícia (usado para todos os usuários)
+            $consulta->bindParam(":id", $this->id,PDO::PARAM_INT);
+            /* Se NÃO FOR um usuário admin, então trate o parâmetro de usuario_id antes de executar. */
+            if ($this->usuario->getTipo() !== 'admin') {
+                
+                
+                //Parâmetro usuario_id
+                $consulta->bindValue(":usuario_id", $this->usuario->getId(),PDO::PARAM_INT);
+            } 
+            $consulta->execute();
+        } catch (Exception $erro) {
+            die("Erro: ". $erro->getMessage());
+        }
+        
+    } //final do atualizar
+
+
+    public function excluir():void {
+        $sql = "DELETE FROM noticias WHERE id = :id";
+        try {
+            $consulta = $this->conexao->prepare($sql);
+            $consulta->bindParam(":id", $this->id, PDO::PARAM_INT);
+            $consulta->execute();
+        } catch (Exception $erro) {
+            die("Erro: ". $erro->getMessage());
+        }
+    }
     /* 
     try {
             

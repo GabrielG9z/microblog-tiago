@@ -40,8 +40,8 @@ $listaDeNoticias = $noticia->listar();
                         <?php if($_SESSION['tipo'] === 'admin') { ?>
 						<th>Autor</th>
 						<?php } ?>
-						<th>Destaque</th>
-						<th class="text-center">Operações</th>
+						<th class="text-center">Destaque</th>
+						<th class="text-center" colspan="2">Operações</th>
 					</tr>
 				</thead>
 
@@ -62,18 +62,24 @@ $listaDeNoticias = $noticia->listar();
 
 							<!-- Operador de Coalescência Nula:
 					Na prática, o valor à esquerda é exibido (desde que ele exista), caso contrário o valor à direita é exibido -->
-							<td> <?= $noticias['autor'] ?? "<i>Equipe Microblog</i>"?> </td>
+								<td> 
+									<?php if($noticias['autor']){
+									echo Utilitarios::limitaCaracter($noticias['autor']);
+								} else {
+									echo "<i>Equipe Microblog</i>";
+								} ?> </td>
+								
 						<?php } ?>
 
 						<td> <?=$noticias['destaque']?> </td>
 						<td class="text-center">
 							<a class="btn btn-primary" 
-							href="noticia-atualiza.php?id="<?=$noticias['id']?>>
+							href="noticia-atualiza.php?id=<?=$noticias['id']?>">
 							<i class="bi bi-pencil"></i> Atualizar
 							</a>
 						
 							<a class="btn btn-danger excluir" 
-							href="noticia-exclui.php?id="<?=$noticias['id']?>>
+							href="noticia-exclui.php?id=<?=$noticias['id']?>">
 							<i class="bi bi-trash"></i> Excluir
 							</a>
 						</td>

@@ -14,5 +14,12 @@ abstract class Utilitarios {
     }
 
     
+
+
+    public static function limitaCaracter($dados) {
+        return mb_strimwidth($dados, 0, 20, " ...");
+    }
+
+    
 }
 

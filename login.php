@@ -88,7 +88,7 @@ if(isset($_POST['entrar'])){
     
 </div>        
         
-        
+  <?php include_once "inc/todas.php"; ?>       
     
 
 

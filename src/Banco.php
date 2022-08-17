@@ -4,9 +4,9 @@ use PDO, Exception;
 
 abstract class Banco {
     private static string $servidor = "localhost";
-    private static string $usuario = "root";
-    private static string $senha = "";
-    private static string $banco = "microblog-tiago";
+    private static string $usuario = "gabrielg9z";
+    private static string $senha = "!Okb?6)4#O*D";
+    private static string $banco = "suniow89_gabrielg9z";
     private static PDO $conexao; 
 
     public static function conecta():PDO {

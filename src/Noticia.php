@@ -3,6 +3,7 @@ namespace Microblog;
 use PDO, Exception;
 
 final class Noticia {
+    // Propriedades de classe 
     private int $id;
     private string $data;
     private string $titulo;
@@ -11,6 +12,7 @@ final class Noticia {
     private string $imagem;
     private string $destaque;
     private int $categoriaId;
+    private string $termo;
 
     /* Criando uma propriedade do tipo Usuario, ou seja, 
     a partir de uma classe que criamos anteriormente,
@@ -280,17 +282,32 @@ final class Noticia {
     /* Função de busca por categorias, está sendo feita a busca no SQL e trazendo os dados pedidos  */
 
     public function listarPorCategoria():array {
-        $sql = "SELECT noticias.id, noticias.titulo, noticias.data, noticias.resumo, usuarios.nome AS autor, categorias.nome AS categoria FROM noticias LEFT JOIN usuarios ON noticias.usuario_id = usuarios.id INNER JOIN categorias ON noticias.categorias_id = categorias_id WHERE categoria_id = :categoria_id" ;
+        $sql = "SELECT noticias.id, noticias.titulo, noticias.data, noticias.resumo, usuarios.nome AS autor, categorias.nome AS categoria FROM noticias LEFT JOIN usuarios ON noticias.usuario_id = usuarios.id INNER JOIN categorias ON noticias.categoria_id = categorias.id WHERE noticias.categoria_id = :categoria_id" ;
         try {
             $consulta = $this->conexao->prepare($sql);
-            $consulta->bindParam(":categoria_id", $this->id, PDO::PARAM_INT);
+            $consulta->bindParam(":categoria_id", $this->categoriaId, PDO::PARAM_INT);
             $consulta->execute();
-            $resultado = $consulta->fetch(PDO::FETCH_ASSOC);
+            $resultado = $consulta->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $erro) {
             die("Erro: ". $erro->getMessage());
     }
     return $resultado;
 }
+
+    public function busca():array {
+        $sql = "SELECT titulo, data, resumo, id FROM noticias WHERE titulo LIKE :termo OR texto LIKE :termo OR resumo LIKE :termo ORDER BY data DESC";
+
+        try {
+             $consulta = $this->conexao->prepare($sql);
+             $consulta->bindValue(":termo", '%'.$this->termo.'%', PDO::PARAM_STR);
+             $consulta->execute();
+             $resultado = $consulta->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $erro) {
+            die("Erro: ". $erro->getMessage());
+        }
+        return $resultado;
+}
+
 
     /* 
     try {
@@ -389,5 +406,29 @@ final class Noticia {
     public function setId(int $id)
     {
         $this->id = $id;
+    }
+
+    /**
+     * Get the value of termo
+     *
+     * @return string
+     */
+    public function getTermo(): string
+    {
+        return $this->termo;
+    }
+
+    /**
+     * Set the value of termo
+     *
+     * @param string $termo
+     *
+     * @return self
+     */
+    public function setTermo(string $termo): self
+    {
+        $this->termo = $termo;
+
+        return $this;
     }
 }
